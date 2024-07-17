@@ -1,14 +1,12 @@
 const endpoints = require("./endpoints.json");
-const { fetchTopics, fetchArticleById } = require("./models");
+const { fetchTopics, fetchArticleById, fetchArticles } = require("./models");
 
 function getTopics(req, res, next) {
   fetchTopics()
     .then((topics) => {
       res.status(200).send({ topics });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 }
 
 function getApi(req, res) {
@@ -21,13 +19,15 @@ function getArticleById(req, res, next) {
     .then((article) => {
       res.status(200).send({ article });
     })
-    .catch((err) => {
-      if (err.status) {
-        res.status(err.status).send({ msg: err.msg });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 }
 
-module.exports = { getTopics, getApi, getArticleById };
+function getArticles(req, res, next) {
+  fetchArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
+}
+
+module.exports = { getTopics, getApi, getArticleById, getArticles };
