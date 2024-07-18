@@ -8,6 +8,7 @@ const {
   addComments,
   updateArticlesVotes,
   removeCommentById,
+  fetchUsers,
 } = require("./models");
 
 function getTopics(req, res, next) {
@@ -84,6 +85,15 @@ function deleteComment(req, res, next) {
     })
     .catch(next);
 }
+
+function getUsers(req, res, next) {
+  fetchUsers()
+    .then((users) => {
+      res.status(200).send({ users });
+    })
+    .catch(next);
+}
+
 module.exports = {
   getTopics,
   getApi,
@@ -93,4 +103,5 @@ module.exports = {
   postComments,
   patchArticleVotes,
   deleteComment,
+  getUsers,
 };
