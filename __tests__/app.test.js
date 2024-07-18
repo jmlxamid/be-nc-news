@@ -4,6 +4,8 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 const endpoints = require("../endpoints.json");
+const { expect } = require("@jest/globals");
+const { response } = require("../app");
 require("jest-sorted");
 
 beforeEach(() => seed(testData));
@@ -152,12 +154,22 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("200:GET /api/articles/:article_id/comments returns an empty array when article exists but has no comments", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+        expect(Array.isArray(comments)).toBe(true);
+        expect(comments.length).toBe(0);
+      });
+  });
   test("404: GET/api/articles/:article_id/comments returns a 404 when article_id doesn't exist", () => {
     return request(app)
       .get("/api/articles/999999/comments")
       .expect(404)
       .then((response) => {
-        expect(response.body.msg).toBe("Comments not found for this article");
+        expect(response.body.msg).toBe("Article not found");
       });
   });
   test("400: GET/api/articles/:article_id/comments returns 400 when article_id is invalid", () => {
@@ -166,6 +178,67 @@ describe("/api/articles/:article_id/comments", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
+describe.only("POST /api/articles/:article_id/comments", () => {
+  test("201: POST /api/articles/:article_id/comments add comments when given article_id", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "Loved this article!",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          article_id: 1,
+          author: "butter_bridge",
+          body: "Loved this article!",
+          created_at: expect.any(String),
+          votes: 0,
+        });
+      });
+  });
+  test("400:POST/api/articles/:article_id/comments returns 400 when invalid article_id is given", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "Loved this article!",
+    };
+    return request(app)
+      .post("/api/articles/invalid_id/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("400:POST/api/articles/:article_id/comments returns 400 when request body is missing required fields", () => {
+    const incompleteComment = {
+      body: "Loved this article!",
+    };
+    return request(app)
+      .post("/api/articles/invalid_id/comments")
+      .send(incompleteComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("404:POST/api/articles/:article_id/comments returns 404 when given an article_id that doesn't exist", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "Loved this article!",
+    };
+    return request(app)
+      .post("/api/articles/invalid_id/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
       });
   });
 });
