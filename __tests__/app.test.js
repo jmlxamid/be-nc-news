@@ -133,3 +133,39 @@ describe("/api/articles", () => {
       });
   });
 });
+describe("/api/articles/:article_id/comments", () => {
+  test("200: GET /api/articles/:article_id/comments returns an array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+        expect(Array.isArray(comments)).toBe(true);
+        expect(comments.length).toBeGreaterThan(0);
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+      });
+  });
+  test("404: GET/api/articles/:article_id/comments returns a 404 when article_id doesn't exist", () => {
+    return request(app)
+      .get("/api/articles/999999/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("Comments not found for this article");
+      });
+  });
+  test("400: GET/api/articles/:article_id/comments returns 400 when article_id is invalid", () => {
+    return request(app)
+      .get("/api/articles/invalid_id/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
