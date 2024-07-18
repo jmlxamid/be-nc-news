@@ -9,6 +9,7 @@ const {
   postComments,
   patchArticleVotes,
   deleteComment,
+  getUsers,
 } = require("./controllers");
 
 app.use(express.json());
@@ -28,6 +29,8 @@ app.post("/api/articles/:article_id/comments", postComments);
 app.patch("/api/articles/:article_id", patchArticleVotes);
 
 app.delete("/api/comments/:comment_id", deleteComment);
+
+app.get("/api/users", getUsers);
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "404 - request not found" });
