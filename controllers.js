@@ -1,9 +1,11 @@
+const { addComment } = require("@babel/types");
 const endpoints = require("./endpoints.json");
 const {
   fetchTopics,
   fetchArticleById,
   fetchArticles,
   fetchCommentsByArticleId,
+  addComments,
 } = require("./models");
 
 function getTopics(req, res, next) {
@@ -44,10 +46,21 @@ function getCommentsByArticleId(req, res, next) {
     .catch(next);
 }
 
+function postComments(req, res, next) {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+  addComments(article_id, username, body)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
+}
+
 module.exports = {
   getTopics,
   getApi,
   getArticleById,
   getArticles,
   getCommentsByArticleId,
+  postComments,
 };
