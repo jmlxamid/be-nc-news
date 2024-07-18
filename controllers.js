@@ -6,6 +6,7 @@ const {
   fetchArticles,
   fetchCommentsByArticleId,
   addComments,
+  updateArticlesVotes,
 } = require("./models");
 
 function getTopics(req, res, next) {
@@ -56,6 +57,22 @@ function postComments(req, res, next) {
     .catch(next);
 }
 
+function patchArticleVotes(req, res, next) {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+
+  if (typeof inc_votes !== "number") {
+    return res.status(400).send({ msg: "Bad request" });
+  }
+  if (isNaN(article_id)) {
+    return res.status(400).send({ msg: "Bad request" });
+  }
+  updateArticlesVotes(article_id, inc_votes)
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch(next);
+}
 module.exports = {
   getTopics,
   getApi,
@@ -63,4 +80,5 @@ module.exports = {
   getArticles,
   getCommentsByArticleId,
   postComments,
+  patchArticleVotes,
 };

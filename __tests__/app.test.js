@@ -181,7 +181,7 @@ describe("/api/articles/:article_id/comments", () => {
       });
   });
 });
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("201: POST /api/articles/:article_id/comments add comments when given article_id", () => {
     const newComment = {
       username: "butter_bridge",
@@ -234,11 +234,87 @@ describe.only("POST /api/articles/:article_id/comments", () => {
       body: "Loved this article!",
     };
     return request(app)
-      .post("/api/articles/invalid_id/comments")
+      .post("/api/articles/999999/comments")
       .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("404:POST/api/articles/:article_id/comments returns 404 when given a username that doesnt exist", () => {
+    const newComment = {
+      username: "i_dont_exist",
+      body: "Loved this article!",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("User not found");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200:PATCH /api/articles/:article_id returns an updated article when incrementing votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article).toMatchObject({
+          article_id: 1,
+          votes: 101,
+        });
+      });
+  });
+  test("200:PATCH /api/articles/:article_id returns an updated article when decrementing votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article).toMatchObject({
+          article_id: 1,
+          votes: 99,
+        });
+      });
+  });
+  test("400: returns 400 when inc_votes is missing", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("400: returns 400 when inc_votes is not a number", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "not-number" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("400: returns 400 when article_id is not valid", () => {
+    return request(app)
+      .patch("/api/articles/invalid_id")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("404: returns a 404 when article_id does not exist", () => {
+    return request(app)
+      .patch("/api/articles/999999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
       });
   });
 });
