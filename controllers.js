@@ -33,7 +33,8 @@ function getArticleById(req, res, next) {
 }
 
 function getArticles(req, res, next) {
-  fetchArticles()
+  const { sort_by, order } = req.query;
+  fetchArticles(sort_by, order)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -64,9 +65,6 @@ function patchArticleVotes(req, res, next) {
   const { inc_votes } = req.body;
 
   if (typeof inc_votes !== "number") {
-    return res.status(400).send({ msg: "Bad request" });
-  }
-  if (isNaN(article_id)) {
     return res.status(400).send({ msg: "Bad request" });
   }
   updateArticlesVotes(article_id, inc_votes)
