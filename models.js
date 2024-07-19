@@ -17,7 +17,20 @@ function fetchArticleById(article_id) {
     });
 }
 
-function fetchArticles() {
+function fetchArticles(sort_by = "created_at", order = "desc") {
+  const validSortByColumns = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+  ];
+  const validOrders = ["asc", "desc"];
+  if (!validSortByColumns.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
   return db
     .query(
       `
@@ -37,7 +50,7 @@ function fetchArticles() {
     GROUP BY
         articles.article_id
     ORDER BY
-        articles.created_at DESC;
+        ${sort_by} ${order}
     `
     )
     .then((body) => {
