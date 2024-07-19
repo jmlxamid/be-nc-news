@@ -28,9 +28,14 @@ function fetchArticles(sort_by = "created_at", order = "desc") {
     "article_img_url",
   ];
   const validOrders = ["asc", "desc"];
+
   if (!validSortByColumns.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
+  if (!validOrders.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
   return db
     .query(
       `

@@ -395,7 +395,7 @@ describe("GET /api/articles", () => {
   });
   test("400: returns 400 when order is  invalid", () => {
     return request(app)
-      .get("/api/articles?sort_by=invalid_order")
+      .get("/api/articles?order=invalid_order")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad request");
