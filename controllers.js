@@ -9,6 +9,7 @@ const {
   updateArticlesVotes,
   removeCommentById,
   fetchUsers,
+  fetchUserByUsername,
 } = require("./models");
 
 function getTopics(req, res, next) {
@@ -92,6 +93,15 @@ function getUsers(req, res, next) {
     .catch(next);
 }
 
+function getUserByUsername(req, res, next) {
+  const { username } = req.params;
+  fetchUserByUsername(username)
+    .then((user) => {
+      res.status(200).send({ user });
+    })
+    .catch(next);
+}
+
 module.exports = {
   getTopics,
   getApi,
@@ -102,4 +112,5 @@ module.exports = {
   patchArticleVotes,
   deleteComment,
   getUsers,
+  getUserByUsername,
 };

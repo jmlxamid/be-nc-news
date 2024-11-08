@@ -19,23 +19,17 @@ const {
 
 app.use(express.json());
 
-app.get("/api/topics", getTopics);
+const articlesRouter = require("./routes/articles");
+const commentsRouter = require("./routes/comments");
+const topicsRouter = require("./routes/topics");
+const usersRouter = require("./routes/users");
 
-app.get("/api", getApi);
+app.use("/api/articles", articlesRouter);
+app.use("/api/comments", commentsRouter);
+app.use("/api/topics", topicsRouter);
+app.use("/api/users", usersRouter);
 
-app.get("/api/articles/:article_id", getArticleById);
-
-app.get("/api/articles", getArticles);
-
-app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
-
-app.post("/api/articles/:article_id/comments", postComments);
-
-app.patch("/api/articles/:article_id", patchArticleVotes);
-
-app.delete("/api/comments/:comment_id", deleteComment);
-
-app.get("/api/users", getUsers);
+app.get("/api", require("./controllers").getApi);
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "404 - request not found" });
