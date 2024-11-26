@@ -8,8 +8,17 @@ const { expect } = require("@jest/globals");
 const { response } = require("../app");
 require("jest-sorted");
 
-beforeEach(() => seed(testData));
-afterAll(() => db.end());
+jest.setTimeout(10000); // 10 seconds
+
+// Seed the database before each test
+beforeEach(async () => {
+  await seed(testData);
+});
+
+// Properly close the database connection after all tests
+afterAll(async () => {
+  await db.end();
+});
 
 describe("/api/topics", () => {
   test("200: GET /api/topics should respond with an array of topics", () => {

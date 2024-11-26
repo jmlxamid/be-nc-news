@@ -73,10 +73,18 @@ function fetchCommentsByArticleId(article_id) {
       }
       return db.query(
         `SELECT
-            comment_id, votes, created_at, author, body, article_id
-            FROM comments
-            WHERE article_id = $1
-            ORDER BY created_at DESC;`,
+          comments.comment_id,
+          comments.votes,
+          comments.created_at,
+          comments.author,
+          comments.body,
+          comments.article_id,
+          users.avatar_url
+        FROM comments
+        JOIN users
+        ON comments.author = users.username
+        WHERE comments.article_id = $1
+        ORDER BY comments.created_at DESC;`,
         [article_id]
       );
     })
@@ -84,6 +92,7 @@ function fetchCommentsByArticleId(article_id) {
       return comments;
     });
 }
+
 function fetchUserByUsername(username) {
   return db
     .query(`SELECT * FROM users WHERE username = $1;`, [username])
