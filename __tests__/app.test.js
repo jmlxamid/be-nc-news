@@ -8,14 +8,12 @@ const { expect } = require("@jest/globals");
 const { response } = require("../app");
 require("jest-sorted");
 
-jest.setTimeout(10000); // 10 seconds
+jest.setTimeout(10000);
 
-// Seed the database before each test
 beforeEach(async () => {
   await seed(testData);
 });
 
-// Properly close the database connection after all tests
 afterAll(async () => {
   await db.end();
 });
